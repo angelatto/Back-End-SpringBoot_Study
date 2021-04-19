@@ -8,21 +8,20 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.servlet.http.HttpServletResponse;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.FileCopyUtils;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-
 import com.mycompany.webapp.dto.Board;
 import com.mycompany.webapp.dto.Pager;
 import com.mycompany.webapp.service.BoardsService;
@@ -37,6 +36,7 @@ public class BoardsController {
 
 	@GetMapping("")
 	public Map<String, Object> list(@RequestParam(defaultValue = "1") int pageNo) {
+		logger.info("내가 여기 왔다 ");
 		int totalRows = boardsService.getCount();
 		Pager pager = new Pager(5, 5, totalRows, pageNo);
 		List<Board> list = boardsService.getList(pager);
@@ -49,7 +49,7 @@ public class BoardsController {
 	}
 
 	@PostMapping("")
-	public void create(Board board) {
+	public Board create(Board board) {
 		logger.info(board.getBtitle());
 		logger.info(board.getBcontent());
 		logger.info(board.getBwriter());
@@ -69,6 +69,8 @@ public class BoardsController {
 			}
 		}
 		boardsService.insert(board);
+		board.setBattach(null); // JSON으로 안만들어 버린다. 
+		return board;
 	}
 
 	@GetMapping("/{bno}")
@@ -83,8 +85,9 @@ public class BoardsController {
 		try {
 			Board board = boardsService.getBoard(bno);
 			String battachoname = board.getBattachoname();
-			if (battachoname == null)
+			if (battachoname == null) {
 				return;
+			}
 			battachoname = new String(battachoname.getBytes("UTF-8"), "ISO-8859-1");
 			String battachsname = board.getBattachsname();
 			String battachspath = "/Users/homecj/Pictures/uploadfiles/" + battachsname;
@@ -103,5 +106,28 @@ public class BoardsController {
 			e.printStackTrace();
 		}
 	}
+	
+	   @PutMapping("")
+	   public Board update(Board board) {
+	      if(board.getBattach() != null && !board.getBattach().isEmpty() ) {
+	         MultipartFile mf = board.getBattach();
+	         board.setBattachoname(mf.getOriginalFilename());
+	         board.setBattachsname(new Date().getTime() + "-" + mf.getOriginalFilename());
+	         board.setBattachtype(mf.getContentType());
+	         try {
+	            File file = new File("/Users/homecj/Pictures/uploadfiles/" + board.getBattachsname());
+	            mf.transferTo(file);
+	         } catch (Exception e) {
+	            e.printStackTrace();
+	         }
+	      }
+	      boardsService.update(board);
+	  	  return board;
+	   }
+	   
+	   @DeleteMapping("/{bno}")
+	   public void delete(@PathVariable int bno) {
+		   boardsService.delete(bno);
+	   }
 
 }

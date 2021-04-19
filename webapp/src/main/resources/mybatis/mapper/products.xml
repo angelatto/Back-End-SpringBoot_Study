@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mycompany.webapp.dao.ProductsDao">
+
+  <select id="selectByPage" parameterType="pager" resultType="product">
+      select  pid, name, description, category, price 
+      from (
+          select rownum as rnum, pid, name, description, category, price 
+          from (
+             select pid, name, description, category, price 
+             from products
+             order by pid desc
+          )
+          where rownum &lt;= #{endRowNo}
+      ) 
+      where rnum &gt;= #{startRowNo}
+   </select>
+   
+   <select id="count" resultType="int">
+   	select count(*) from products
+   </select>
+   
+   <select id="selectByPid" parameterType="int" resultType="product">
+      select pid, name, description, category, price
+      from products
+      where pid=#{pid}
+   </select>
+   
+   <insert id="insert" parameterType="product">
+      <selectKey order="BEFORE" resultType="int" keyProperty="pid">
+         select productspid.nextval from dual
+      </selectKey>
+      insert into products (pid, name, description, category, price)
+      values (#{pid}, #{name}, #{description}, #{category}, #{price})
+   </insert>
+   
+   <delete id="deleteByPid" parameterType="int">
+      delete from products where pid=#{pid}
+   </delete>
+   
+   <update id="update" parameterType="product">
+      update products set name=#{name}, description=#{description}, category=#{category}, price=#{price} where pid=#{pid}
+   </update>
+</mapper>

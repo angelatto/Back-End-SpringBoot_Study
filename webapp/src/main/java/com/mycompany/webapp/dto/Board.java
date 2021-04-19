@@ -10,7 +10,7 @@ public class Board {
    private String bwriter;
    private Date bdate;
    private int bhitcount;
-   private MultipartFile battach;
+   private MultipartFile battach; // 얘는 JSON으로 바꿀 수 없다. 
    private String battachoname;
    private String battachsname;
    private String battachtype;
