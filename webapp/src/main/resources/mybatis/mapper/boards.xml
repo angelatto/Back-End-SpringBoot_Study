@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mycompany.webapp.dao.BoardsDao">
+   <select id="selectByPage" parameterType="pager" resultType="board">
+      select rnum, bno, btitle, bwriter, bdate, bhitcount
+      from (
+          select rownum as rnum, bno, btitle, bwriter, bdate, bhitcount
+          from (
+             select bno, btitle, bwriter, bdate, bhitcount 
+             from boards
+             order by bno desc
+          )
+          where rownum &lt;= #{endRowNo}
+      ) 
+      where rnum &gt;= #{startRowNo}
+   </select>
+   
+   <select id="count" resultType="int">
+      select count(*) from boards
+   </select>
+   
+   <select id="selectByBno" parameterType="int" resultType="board">
+      select bno, btitle, bcontent, bwriter, bdate, bhitcount, battachoname, battachsname, battachtype 
+      from boards 
+      where bno=#{bno}
+   </select>
+   
+   <insert id="insert" parameterType="board">
+      <selectKey order="BEFORE" resultType="int" keyProperty="bno">
+         select boardsbno.nextval from dual
+      </selectKey>
+      <if test="battachoname == null">
+       insert into boards (bno, btitle, bcontent, bwriter, bdate, bhitcount)
+         values (#{bno}, #{btitle}, #{bcontent}, #{bwriter}, sysdate, 0)
+     </if>
+      <if test="battachoname != null">
+       insert into boards (bno, btitle, bcontent, bwriter, bdate, bhitcount, battachoname, battachsname, battachtype)
+         values (#{bno}, #{btitle}, #{bcontent}, #{bwriter}, sysdate, 0, #{battachoname}, #{battachsname}, #{battachtype})
+     </if>
+   </insert>
+   
+   <delete id="deleteByBno" parameterType="int">
+      delete from boards where bno=#{bno}
+   </delete>
+   
+   <update id="update" parameterType="board">
+      <if test="battachoname == null">
+         update boards set 
+            btitle=#{btitle}, 
+            bcontent=#{bcontent},
+            bdate=sysdate
+         where bno=#{bno}
+      </if>
+      <if test="battachoname != null">
+         update boards set 
+            btitle=#{btitle}, 
+            bcontent=#{bcontent},
+            bdate=sysdate,
+            battachoname=#{battachoname},
+            battachsname=#{battachsname},
+            battachtype=#{battachtype}
+         where bno=#{bno}
+      </if>
+   </update>
+   
+   <update id="updateBhitcount" parameterType="int">   
+      update boards set bhitcount=bhitcount+1 where bno=#{bno}   
+   </update>
+</mapper>
