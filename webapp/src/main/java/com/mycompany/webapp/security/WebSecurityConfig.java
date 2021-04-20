@@ -80,7 +80,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
 	}
 	
 	// 사용자의 상세 정보를 가져오는 서비스 객체를 Spring 관리 객체로 등록 
-	//=> JwtAuthenticationFilter에서 사용 
+	//=> JwtAuthenticationFilter 생성자 호출할 때 매개변수로 전달 
 	@Bean
 	@Override
 	public UserDetailsService userDetailsServiceBean() throws Exception {
@@ -88,7 +88,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
 	}
 	
 	// 인증된 정보를 관리하는 객체를 Spring 관리 객체로 등록 
-	//=>  JwtAuthenticationFilter 에서 사용 
+	// AuthController에서 사용  
 	@Bean
 	public AuthenticationManager anthenticationManagerBean() throws Exception{
 		return super.authenticationManagerBean();

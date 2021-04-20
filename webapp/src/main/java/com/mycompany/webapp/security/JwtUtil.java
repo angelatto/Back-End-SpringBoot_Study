@@ -35,12 +35,12 @@ public class JwtUtil {
 
 	}
 
-	// JWT를 파싱해서 uid 얻기,  복호화 
+	// JWT를 파싱해서 uid 얻기
 	public static String getUid(String token) {
 		String uid = null;
 		try {
 			JwtParser parser = Jwts.parser();
-			parser.setSigningKey(secretKey.getBytes("UTF-8"));
+			parser.setSigningKey(secretKey.getBytes("UTF-8"));  // 비밀키로 복호화 
 			Jws<Claims> jws = parser.parseClaimsJws(token);
 			Claims claims = jws.getBody();
 			uid = claims.get("uid", String.class);
@@ -71,25 +71,25 @@ public class JwtUtil {
 		return validate;
 	}
 
-	// 테스트
-	public static void main(String[] args) {
-		// 토큰 생성
-		String jwt = createToken("user1");
-		logger.info(jwt);
-
-		// 지연
-		try {
-			Thread.sleep(5000);
-		} catch (Exception e) {
-
-		}
-
-		// 토큰 정보 얻기
-		if (validateToken(jwt)) {
-			String uid = getUid(jwt);
-			logger.info(uid);
-		}
-
-	}
+//	// 테스트
+//	public static void main(String[] args) {
+//		// 토큰 생성
+//		String jwt = createToken("user1");
+//		logger.info(jwt);
+//
+//		// 지연
+//		try {
+//			Thread.sleep(5000);
+//		} catch (Exception e) {
+//
+//		}
+//
+//		// 토큰 정보 얻기
+//		if (validateToken(jwt)) {
+//			String uid = getUid(jwt);
+//			logger.info(uid);
+//		}
+//
+//	}
 
 }

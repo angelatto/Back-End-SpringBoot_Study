@@ -37,12 +37,12 @@ public class JwtAuthenticationFilter extends GenericFilterBean { // 제네릭필
 			// <img src="download?bno=3&authToken=xxxx"/>
 			jwt = request.getParameter("authToken");
 		}
-		if (jwt != null) { // 얘가 실행이 안되면 인증이 안되었다는 것이다.
+		if (jwt != null) { // 인증이 된 경우 
 			if (JwtUtil.validateToken(jwt)) { // 토큰의 만료기간이 지나지 않았을 때
 				// JWT 에서 uid 얻기
 				String uid = JwtUtil.getUid(jwt); // uid 뽑아옴
 				// DB에서 uid에 해당하는 정보를 가져오기 (이름, 권한(ROLE)들 - user이면서 admin)
-				UserDetails userDetails = userDetailsService.loadUserByUsername(uid); // db에서 user 정보 가져옴
+				UserDetails userDetails = userDetailsService.loadUserByUsername(uid); // DB에서 user 정보 가져옴
 
 				/* 스프링 시큐리티 실행환경에 인증 성공했다는 것을 알려주기 위해 세터 실행 */
 				// 인증 "성공" 객체 생성 
@@ -52,7 +52,7 @@ public class JwtAuthenticationFilter extends GenericFilterBean { // 제네릭필
 				SecurityContextHolder.getContext().setAuthentication(authentication);
 			}
 		}
-		chain.doFilter(request, response); //  그다음 필터를 실행해라 
+		chain.doFilter(request, response); //  그다음 필터를 실행해라 (?? ) 이거 반드시 있어야함 
 	}
 
 }
